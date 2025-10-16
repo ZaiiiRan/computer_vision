@@ -24,8 +24,17 @@ while True:
     moments = cv2.moments(mask)
     area = moments['m00'] / 255
 
-    frame = cv2.bitwise_and(frame, frame, mask=mask)
-    cv2.putText(frame, f"Area: {area} px", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    if area > 500:
+        cx = int(moments['m10'] / moments['m00'])
+        cy = int(moments['m01'] / moments['m00'])
+
+        y_coords, x_coords = np.where(mask > 0)
+        x_min, x_max = x_coords.min(), x_coords.max()
+        y_min, y_max = y_coords.min(), y_coords.max()
+
+        cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
+        cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 0, 0), 2)
+        cv2.putText(frame, f"Area: {area} px", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     cv2.imshow("Red tracker", frame)
 

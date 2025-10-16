@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 
 cap = cv2.VideoCapture(0)
+kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 
 while True:
     ret, frame = cap.read()
@@ -10,9 +11,15 @@ while True:
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    mask1 = cv2.inRange(hsv, np.array([0, 100, 100]), np.array([20, 255, 255]))
-    mask2 = cv2.inRange(hsv, np.array([160, 100, 100]), np.array([180, 255, 255]))
+    mask1 = cv2.inRange(hsv, np.array([0, 150, 120]), np.array([20, 255, 255]))
+    mask2 = cv2.inRange(hsv, np.array([160, 150, 120]), np.array([180, 255, 255]))
     mask = mask1 | mask2
+
+    mask = cv2.erode(mask, kernel, iterations=1)
+    mask = cv2.dilate(mask, kernel, iterations=1)
+
+    mask = cv2.dilate(mask, kernel, iterations=1)
+    mask = cv2.erode(mask, kernel, iterations=1)
 
     cv2.imshow("Red tracker", cv2.bitwise_and(frame, frame, mask=mask))
 

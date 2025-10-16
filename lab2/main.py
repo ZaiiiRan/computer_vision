@@ -21,7 +21,13 @@ while True:
     mask = cv2.dilate(mask, kernel, iterations=1)
     mask = cv2.erode(mask, kernel, iterations=1)
 
-    cv2.imshow("Red tracker", cv2.bitwise_and(frame, frame, mask=mask))
+    moments = cv2.moments(mask)
+    area = moments['m00'] / 255
+
+    frame = cv2.bitwise_and(frame, frame, mask=mask)
+    cv2.putText(frame, f"Area: {area} px", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+    cv2.imshow("Red tracker", frame)
 
     if cv2.waitKey(1) & 0xFF == 27:
         break

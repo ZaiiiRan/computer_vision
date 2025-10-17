@@ -3,6 +3,7 @@ import numpy as np
 
 cap = cv2.VideoCapture(0)
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+trajectory = []
 
 while True:
     ret, frame = cap.read()
@@ -28,13 +29,19 @@ while True:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
 
+        trajectory.append([cx, cy])
+        print(trajectory)
+
         y_coords, x_coords = np.where(mask > 0)
         x_min, x_max = x_coords.min(), x_coords.max()
         y_min, y_max = y_coords.min(), y_coords.max()
 
+        cv2.polylines(frame, np.array([trajectory]), False, (255, 0, 0), 2)
         cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
         cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 0, 0), 2)
         cv2.putText(frame, f"Area: {area} px", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    else:
+        trajectory = []
 
     cv2.imshow("Red tracker", frame)
 

@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
 
-blur_parameter = 3
-
 def build_kernel(size, sigma):
     matr = np.zeros((size, size), dtype=float)
 
@@ -43,9 +41,16 @@ gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 cv2.namedWindow('Original gray image', cv2.WINDOW_NORMAL)
 cv2.imshow('Original gray image', gray_image)
 
-blurred_image = gaussian_blur(5, blur_parameter, image)
-cv2.namedWindow('Blurred gray image', cv2.WINDOW_NORMAL)
-cv2.imshow('Blurred gray image', blurred_image)
+kernel_sizes = [3, 7]
+blur_parameters = [3, 15]
+
+for size in kernel_sizes:
+    for blur_parameter in blur_parameters:
+        blurred_image = gaussian_blur(size, blur_parameter, image)
+        
+        windowName = f'Blurred gray image, kernel size: {size}, blur parameter: {blur_parameter}'
+        cv2.namedWindow(windowName, cv2.WINDOW_NORMAL)
+        cv2.imshow(windowName, blurred_image)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()

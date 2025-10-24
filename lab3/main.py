@@ -52,7 +52,7 @@ for size in kernel_sizes:
         cv2.namedWindow(windowName, cv2.WINDOW_NORMAL)
         cv2.imshow(windowName, blurred_image)
 
-        blurred_image_by_cv2 = cv2.GaussianBlur(gray_image, (size, size), blur_parameter)
+        blurred_image_by_cv2 = cv2.GaussianBlur(gray_image, (size, size), blur_parameter, cv2.BORDER_REFLECT)
         windowNameByCv2 = f'Blurred by cv2 gray image, kernel size: {size}, blur parameter: {blur_parameter}'
         cv2.namedWindow(windowNameByCv2, cv2.WINDOW_NORMAL)
         cv2.imshow(windowNameByCv2, blurred_image_by_cv2)

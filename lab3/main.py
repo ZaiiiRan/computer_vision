@@ -18,18 +18,34 @@ def build_kernel(size, sigma):
 def norm_kernel(kernel):
     return kernel / kernel.sum()
 
-kernel3 = build_kernel(3, blur_parameter)
-kernel5 = build_kernel(5, blur_parameter)
-kernel7 = build_kernel(7, blur_parameter)
+def gaussian_blur(kernel_size, blur_parameter, image):
+    kernel = build_kernel(kernel_size, blur_parameter)
+    kernel = norm_kernel(kernel)
 
-print('Ядро свертки 3x3: ', kernel3)
-print('Ядро свертки 5x5: ', kernel5)
-print('Ядро свертки 7x7: ', kernel7)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-kernel3 = norm_kernel(kernel3)
-kernel5 = norm_kernel(kernel5)
-kernel7 = norm_kernel(kernel7)
+    height, width = gray_image.shape
+    padding = kernel_size // 2
 
-print('Нормированное ядро свертки 3x3: ', kernel3)
-print('Нормированное ядро свертки 5x5: ', kernel5)
-print('Нормированное ядро свертки 7x7: ', kernel7)
+    padded_image = cv2.copyMakeBorder(gray_image, padding, padding, padding, padding, cv2.BORDER_REFLECT)
+
+    blurred_image = np.zeros_like(gray_image, dtype=float)
+    for i in range(height):
+        for j in range(width):
+            region = padded_image[i:i+kernel_size, j:j+kernel_size]
+            blurred_image[i, j] = np.sum(region * kernel)
+    
+    return np.clip(blurred_image, 0, 255).astype(np.uint8)
+
+image = cv2.imread('../lab1/imgs/cat.png')
+
+gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+cv2.namedWindow('Original gray image', cv2.WINDOW_NORMAL)
+cv2.imshow('Original gray image', gray_image)
+
+blurred_image = gaussian_blur(5, blur_parameter, image)
+cv2.namedWindow('Blurred gray image', cv2.WINDOW_NORMAL)
+cv2.imshow('Blurred gray image', blurred_image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

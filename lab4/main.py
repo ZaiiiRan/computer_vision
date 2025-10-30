@@ -57,9 +57,28 @@ def highlight_borders(image_path):
 
     angle = angle_round(grad_x, grad_y, tg)
 
-    print(f'Матрица длин градиентов:\n{grad_magnitude}\n')
-    print(f'Матрица углов градиентов:\n{angle}\n')
+    non_maximum_suppression = np.zeros_like(grad_magnitude, dtype=np.uint8)
+    for i in range(1, grad_magnitude.shape[0] - 1):
+        for j in range(1, grad_magnitude.shape[1] - 1):
+            direction = angle[i, j]
+            magnitude = grad_magnitude[i, j]
 
+            if direction in [0, 4]:
+                neighbors = [grad_magnitude[i, j - 1], grad_magnitude[i, j + 1]]
+            elif direction in [1, 5]:
+                neighbors = [grad_magnitude[i - 1, j + 1], grad_magnitude[i + 1, j - 1]]
+            elif direction in [2, 6]:
+                neighbors = [grad_magnitude[i - 1, j], grad_magnitude[i + 1, j]]
+            else :
+                neighbors = [grad_magnitude[i - 1, j - 1], grad_magnitude[i + 1, j + 1]]
+
+            if magnitude >= max(neighbors):
+                non_maximum_suppression[i, j] = 255
+            else:
+                non_maximum_suppression[i, j] = 0
+    
+    cv2.namedWindow('Non Maximum Suppression', cv2.WINDOW_NORMAL)
+    cv2.imshow("Non Maximum Suppression", non_maximum_suppression)
 
 
 highlight_borders('./cat.jpg')

@@ -21,7 +21,7 @@ def highlight_borders(image_path):
 
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 3)
+    blurred_image = cv2.GaussianBlur(gray_image, (7, 7), 4)
 
     cv2.namedWindow('Original', cv2.WINDOW_NORMAL)
     cv2.imshow("Original", image)
@@ -77,8 +77,28 @@ def highlight_borders(image_path):
             else:
                 non_maximum_suppression[i, j] = 0
     
-    cv2.namedWindow('Non Maximum Suppression', cv2.WINDOW_NORMAL)
-    cv2.imshow("Non Maximum Suppression", non_maximum_suppression)
+    max_grad = np.max(grad_magnitude)
+    low_level = max_grad // 9
+    high_level = max_grad // 17
+
+    strong_edges = (grad_magnitude >= high_level)
+    weak_edges = ((grad_magnitude >= low_level) & (grad_magnitude < high_level))
+
+    result = np.zeros_like(non_maximum_suppression, dtype=np.uint8)
+    result[strong_edges & (non_maximum_suppression == 255)] = 255
+
+    for i in range(1, grad_magnitude.shape[0] - 1):
+        for j in range(1, grad_magnitude.shape[1] - 1):
+            if weak_edges[i, j] and non_maximum_suppression[i, j] == 255:
+                region = result[i-1:i+2, j-1:j+2]
+                if np.any(region == 255):
+                    result[i, j] = 255
+    
+    contoured_image = image.copy()
+    contoured_image[result == 255] = [0, 255, 0]
+
+    cv2.namedWindow('Contoured', cv2.WINDOW_NORMAL)
+    cv2.imshow("Contoured", contoured_image)
 
 
 highlight_borders('./cat.jpg')

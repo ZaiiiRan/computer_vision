@@ -57,6 +57,9 @@ def highlight_borders(image_path):
 
     angle = angle_round(grad_x, grad_y, tg)
 
+    print(f'Матрица значений длин:\n{grad_magnitude}\n')
+    print(f'Матрица значений углов:\n{angle}\n')
+
     non_maximum_suppression = np.zeros_like(grad_magnitude, dtype=np.uint8)
     for i in range(1, grad_magnitude.shape[0] - 1):
         for j in range(1, grad_magnitude.shape[1] - 1):
@@ -72,13 +75,16 @@ def highlight_borders(image_path):
             else :
                 neighbors = [grad_magnitude[i - 1, j - 1], grad_magnitude[i + 1, j + 1]]
 
-            if magnitude >= max(neighbors):
+            if magnitude > max(neighbors):
                 non_maximum_suppression[i, j] = 255
             else:
                 non_maximum_suppression[i, j] = 0
     
+    cv2.namedWindow("Non maximum suppression", cv2.WINDOW_NORMAL)
+    cv2.imshow("Non maximum suppression", non_maximum_suppression)
+    
     max_grad = np.max(grad_magnitude)
-    low_level = max_grad // 9
+    low_level = max_grad // 13
     high_level = max_grad // 17
 
     strong_edges = (grad_magnitude >= high_level)
@@ -93,6 +99,9 @@ def highlight_borders(image_path):
                 region = result[i-1:i+2, j-1:j+2]
                 if np.any(region == 255):
                     result[i, j] = 255
+    
+    cv2.namedWindow('Double threshold filtering', cv2.WINDOW_NORMAL)
+    cv2.imshow("Double threshold filtering", result)
     
     contoured_image = image.copy()
     contoured_image[result == 255] = [0, 255, 0]

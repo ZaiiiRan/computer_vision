@@ -84,8 +84,8 @@ def highlight_borders(image_path):
     cv2.imshow("Non maximum suppression", non_maximum_suppression)
     
     max_grad = np.max(grad_magnitude)
-    low_level = max_grad // 13
-    high_level = max_grad // 17
+    low_level = max_grad // 12
+    high_level = max_grad // 6
 
     strong_edges = (grad_magnitude >= high_level)
     weak_edges = ((grad_magnitude >= low_level) & (grad_magnitude < high_level))

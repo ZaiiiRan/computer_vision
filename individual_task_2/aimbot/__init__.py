@@ -1,0 +1,1 @@
+from .aimbot import Aimbot
